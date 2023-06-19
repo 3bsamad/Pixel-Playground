@@ -6,7 +6,14 @@ from PIL import Image
 from typing import Literal
 from tqdm import tqdm
 from multiprocessing import Pool
+import argparse
 
+parser = argparse.ArgumentParser(description='Resize images in a directory')
+parser.add_argument('--input', type=str, help='path to input directory')
+parser.add_argument('--output', type=str, help='path to output directory')
+parser.add_argument('--size', type=int,nargs='+', help='size of output images')
+parser.add_argument('--backend', type=str, default='cv2', help='backend to use for resizing')
+parser.add_argument('--extension', type=str, default='jpg', help='extension of images to resize')
 
 def resize(img: np.ndarray, size: tuple[int, int], backend: Literal["cv2", "pil"] = "cv2") -> np.ndarray | Image.Image:
     """
@@ -105,10 +112,21 @@ def resize_images_in_directory(input_dir: str, output_dir: str, size: tuple[int,
 
 
 def main():
-    in_dir = '/home/bmw/Desktop/Projects/gans/GANs/dataset/Hands/Hands/'
-    out_dir = '/home/bmw/Desktop/Projects/resized/'
-    resize_images_in_directory(in_dir, out_dir, (32, 32), "cv2")
-
+    """
+    Example usage:
+    python resize.py --input /path/to/input/directory --output /path/to/output/directory --size 256 256 --backend cv2 --extension jpg
+    """
+    # get in and out directories as argparser arguments
+    args = parser.parse_args()
+    in_dir = args.input
+    out_dir = args.output
+    size = tuple(args.size)
+    backend = args.backend
+    
+    # in_dir = '/home/bmw/Desktop/Projects/gans/GANs/dataset/Hands/Hands/'
+    # out_dir = '/home/bmw/Desktop/Projects/resized/'
+    resize_images_in_directory(in_dir, out_dir, size, backend=backend)
+    print('Done!')
 
 if __name__ == '__main__':
     main()
